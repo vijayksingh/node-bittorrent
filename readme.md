@@ -37,7 +37,7 @@ This is the result we got once we parse the torrent.
     - The UDP protocol also doesn't ensure whether all the data will arrive or not and sometime you have to resend or re-request data.
     - But for some reasons, udp is often a good choice for trackers because they send small messages, and we use tcp for when we actually transfer files between peers because those files tend to be larger and must arrive intact.
 
-### Sending messages with UDP
+- Now we are going to send the UDP request.
 
 ### UDP Trcacker protocol and message format.
 
