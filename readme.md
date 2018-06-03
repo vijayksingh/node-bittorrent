@@ -13,6 +13,8 @@ The bittorrent protocol has two parts.
 - Interesting thing is torrent operates on udp protocol instead of http protocol.
 
 ## Bencode 
+ - The output probably looked fairly incomprehensible to you as it's written in Bencode.
+ - Bencode is data serialization format just like XML and JSON.
 
 ## Getting Peers via the Tracker
 
