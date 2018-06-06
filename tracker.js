@@ -14,7 +14,7 @@ module.exports.getPeers = (torrent, callback) => {
 
   // 1 Send connect request.
   udpSend(socket, buildConneqReq(), url);
- 
+
   socket.on('message', response => {
     if (respType(response) === 'connect') {
       // 2. Recieve and parse connect response
@@ -30,13 +30,15 @@ module.exports.getPeers = (torrent, callback) => {
   })
 }
 
-function udpSend(socket, message, rawUrl, callback =()=> {}) {
+function udpSend(socket, message, rawUrl, callback = () => { }) {
   const url = urlParse(rawUrl);
   socket.send(message, 0, message.length, url.port, url.host, callback);
 }
 
 function respType(response) {
-
+  const action = response.readUInt32BE(0);
+  if (action === 0) return 'connect';
+  if (action === 1) return 'announce';
 }
 
 function buildConnReq() {
@@ -51,7 +53,7 @@ function buildConnReq() {
   buf.writeUInt32BE(0x27101980, 4); // value 0x27101980 with offset of 4 bytes
 
 
-  
+
 
 
   // action id
@@ -137,7 +139,27 @@ function buildAnnounceReq(connId, torrent, port = 6881) {
   return buf;
 }
 
+
 function parseAnnounceReq(response) {
-  
+  function group(iterable, groupSize) {
+    let groups = [];
+    for (let i = 0; i < iterable.length; i += groupSize) {
+      groups.push(iterable.slice(i, i + groupSize));
+    }
+    return groups;
+  }
+
+  return {
+    action: response.readUInt32BE(0),
+    transactionId: response.readUInt32BE(4),
+    leechers: response.readUInt32BE(8),
+    seeders: response.readUInt32BE(12),
+    peers: group(response.slice(20), 6).map(address => {
+      return {
+        ip: address.slice(0, 4).join('.'),
+        port: address.readUInt32BE(4)
+      }
+    })
+  }
 }
 
